@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jay Arnaldo B. Reyes — QA Tester</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #faf6ee;
+    --ink: #262524;
+    --ink-soft: #6b6862;
+    --line: #e8e1d4;
+    --accent: #e2632b;
+    --accent-soft: #fbe6d9;
+    --card: #ffffff;
+  }
+
+  :root[data-theme="dark"] {
+    --paper: #1c1a17;
+    --ink: #f3efe7;
+    --ink-soft: #a9a49a;
+    --line: #34302a;
+    --accent: #f0784a;
+    --accent-soft: #3a2419;
+    --card: #262320;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  /* ===== LOADING SCREEN ===== */
+  #loader {
+    position: fixed;
+    inset: 0;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+
+  #loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .loader-brand {
+    position: relative;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--accent);
+  }
+
+  /* gumagalaw na tuldok: . .. ... */
+  .loader-dots {
+    position: absolute;
+    left: 100%;
+  }
+
+  .loader-dots::after {
+    content: '';
+    animation: dots 1.4s steps(1, end) infinite;
+  }
+
+  @keyframes dots {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+  }
+
+  .loader-percent {
+    font-weight: 800;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .loader-bar {
+    width: min(260px, 70vw);
+    height: 6px;
+    background: var(--line);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .loader-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.15s linear;
+  }
+  /* ===== END LOADING SCREEN ===== */
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+
+  nav {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+
+  nav .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--accent);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1.6rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-links a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  .theme-toggle {
+    background: none;
+    border: 1.5px solid var(--accent);
+    border-radius: 999px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--accent);
+    font-size: 1.05rem;
+  }
+
+  header.hero {
+    padding: 4.5rem 0 3.5rem;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .hero-greeting { color: var(--ink-soft); font-weight: 600; margin: 0 0 0.3rem; }
+
+  h1 {
+    font-weight: 800;
+    font-size: 2.9rem;
+    line-height: 1.1;
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.01em;
+  }
+
+  .role { color: var(--accent); font-size: 1.02rem; font-weight: 600; margin: 0 0 1rem; }
+
+  .tagline { color: var(--ink-soft); margin: 0 0 1.8rem; max-width: 46ch; }
+
+  .cta-row { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-block;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+  }
+
+  .btn.primary { background: var(--accent); color: #fff; }
+  .btn:hover { opacity: 0.85; }
+
+  .avatar-wrap {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 6px solid var(--card);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+
+  .avatar-wrap span {
+    font-size: 3.2rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  section { padding: 3rem 0; border-top: 1px solid var(--line); }
+
+  .section-label {
+    font-size: 0.85rem; color: var(--accent); font-weight: 700; margin: 0 0 1.2rem;
+  }
+
+  section p { margin: 0; max-width: 64ch; }
+
+  .project-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.5rem 1.6rem;
+  }
+
+  .project-card + .project-card { margin-top: 1.1rem; }
+
+  /* background photo sa loob ng card (madilim na larawan = puting text) */
+  .project-card.has-bg {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    color: #fff;
+  }
+
+  .project-card.has-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('ncore.jpg') center 35% / cover no-repeat; /* palitan ang pangalan ng larawan */
+    z-index: -2;
+  }
+
+  /* madilim na takip: mas makapal sa kaliwa (text), mas manipis sa kanan. Baguhin ang .90 / .45 para sa linaw ng larawan */
+  .project-card.has-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(10, 14, 28, 0.90) 0%, rgba(10, 14, 28, 0.78) 55%, rgba(10, 14, 28, 0.45) 100%);
+    z-index: -1;
+  }
+
+  .project-card.has-bg .project-meta { color: #c9d1e0; }
+  .project-card.has-bg p.desc { color: #f3f5fa; }
+
+  /* ⬇⬇⬇ BAGO (1 of 3): CSS ng background ng WORK EXPERIENCE card ⬇⬇⬇ */
+  .project-card.bg-internship::before {
+    background: url('internship.jpg') center / cover no-repeat;
+  }
+  /* ⬆⬆⬆ END NG BAGO (1 of 3) ⬆⬆⬆ */
+
+  /* ⬇⬇⬇ HALIMBAWA para sa susunod na project: alisin ang comment sa paligid nito kung gagamitin ⬇⬇⬇
+  .project-card.bg-project2::before {
+    background: url('project2.jpg') center / cover no-repeat;
+  }
+  ⬆⬆⬆ END NG HALIMBAWA ⬆⬆⬆ */
+
+  .project-card h3 { margin: 0 0 0.2rem; font-size: 1.1rem; font-weight: 700; }
+
+  .project-meta { color: var(--ink-soft); font-size: 0.85rem; margin: 0 0 0.8rem; }
+
+  .project-card p.desc { font-size: 0.95rem; color: var(--ink); margin-bottom: 1rem; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.9rem; }
+
+  .tag {
+    font-size: 0.78rem; padding: 0.28rem 0.75rem; background: var(--accent-soft);
+    border-radius: 999px; color: var(--accent); font-weight: 600;
+  }
+
+  .project-link { font-size: 0.88rem; color: var(--accent); text-decoration: none; font-weight: 600; }
+  .project-link:hover { text-decoration: underline; }
+
+  .exp-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.8rem;
+  }
+
+  .exp-list { margin: 0.9rem 0 0; padding-left: 1.1rem; font-size: 0.95rem; }
+  .exp-list li { margin-bottom: 0.45rem; }
+  .exp-list li:last-child { margin-bottom: 0; }
+
+  .skill-block + .skill-block { margin-top: 1.7rem; }
+  .skill-block h3 { font-size: 0.95rem; font-weight: 700; margin: 0 0 0.7rem; }
+
+  .skill-items { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 0; margin: 0; list-style: none; }
+
+  .skill-items li {
+    font-size: 0.88rem; padding: 0.4rem 0.9rem; background: var(--card);
+    border: 1px solid var(--line); border-radius: 999px; color: var(--ink);
+  }
+
+  .beyond-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+  }
+
+  .beyond-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.3rem;
+  }
+
+  .beyond-card .emoji { font-size: 1.4rem; }
+  .beyond-card h4 { margin: 0.6rem 0 0.4rem; font-size: 0.88rem; color: var(--accent); font-weight: 700; }
+  .beyond-card p { font-size: 0.9rem; margin: 0; color: var(--ink-soft); }
+
+  .contact-row { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 1.2rem; }
+
+  footer {
+    padding: 1.8rem 0 3rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  @media (max-width: 640px) {
+    header.hero { grid-template-columns: 1fr; text-align: left; }
+    .avatar-wrap { margin: 0; order: -1; width: 140px; height: 140px; }
+    .avatar-wrap span { font-size: 2.2rem; }
+  }
+
+  @media (max-width: 480px) {
+    .wrap { padding: 0 1.25rem; }
+    h1 { font-size: 2.2rem; }
+    .nav-links { gap: 1rem; }
+    .nav-links a { font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN: dapat nasa pinakataas ng body -->
+<div id="loader">
+  <span class="loader-brand">Loading portfolio<span class="loader-dots"></span></span>
+  <div class="loader-percent" id="loaderPercent">0%</div>
+  <div class="loader-bar"><div class="loader-bar-fill" id="loaderFill"></div></div>
+</div>
+
+<nav>
+  <div class="wrap">
+    <span class="brand">yaji.</span>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#current">Current</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero" id="home">
+    <div>
+      <p class="hero-greeting">Hi, I'm</p>
+      <h1>Jay Arnaldo<br>B. Reyes</h1>
+      <p class="role">Fresh Graduate - Information Technology</p>
+      <p class="tagline">Skilled in hardware troubleshooting, QA analysis, and web development — a well-rounded foundation across the IT stack.</p>
+      <div class="cta-row">
+        <a href="#projects" class="btn primary">See My Work</a>
+        <a href="#contact" class="btn">Get In Touch</a>
+      </div>
+    </div>
+    <div class="avatar-wrap">
+      <img src="1st.jpg" style = "width:100%;height:100%;object-fit:cover;border-radius:50%;">
+    </div>
+  </header>
+
+  <section id="about">
+    <p class="section-label">About Me</p>
+    <p>
+      Hi, I'm Jay — a fresh graduate of the Diploma in Information
+      Technology program at the Polytechnic University of the Philippines,
+      with hands-on experience as a remote quality assurance intern at NTEK
+      Systems Inc. I'm skilled in executing manual test cases, reporting
+      software defects, validating front-end design integrity, writing
+      structured technical documentation, and hardware troubleshooting. I'm
+      a detail-oriented, adaptable, and systematic troubleshooter eager to
+      deliver high-quality software solutions in a dynamic team
+      environment. I'm also willing to learn new things and open to being
+      trained, always looking to grow further in the field.
+    </p>
+  </section>
+
+  <section id="experience">
+    <p class="section-label">Work Experience</p>
+
+    <!-- ⬇⬇⬇ BAGO (2 of 3): dinagdag ang "has-bg bg-internship" sa class ng card na ito ⬇⬇⬇ -->
+    <div class="project-card has-bg bg-internship">
+    <!-- ⬆⬆⬆ END NG BAGO (2 of 3) ⬆⬆⬆ -->
+      <div class="exp-head">
+        <h3>Quality Assurance Tester (Intern)</h3>
+        <span class="tag">2 years</span>
+      </div>
+      <p class="project-meta">NTEK Systems Inc. &middot; Remote Internship</p>
+      <!-- [[Idagdag dito ang eksaktong petsa, hal. "June 2024 – May 2026", sa project-meta sa taas]] -->
+      <ul class="exp-list">
+        <li>Executed manual test cases and documented results across multiple software modules.</li>
+        <li>Reported and tracked software defects with clear, structured bug reports.</li>
+        <li>Applied both black box and white box testing approaches.</li>
+        <li>Validated front-end design integrity across pages and features.</li>
+        <li>Wrote structured technical documentation for testing and project requirements.</li>
+        <!-- [[Idagdag ng numero kung meron: hal. "Executed 200+ test cases, reported 50+ bugs"]] -->
+      </ul>
+    </div>
+  </section>
+
+  <section id="projects">
+    <p class="section-label">Projects</p>
+
+    <div class="project-card has-bg">
+      <h3>N-CORE — HRIS Platform</h3>
+      <p class="project-meta">Capstone Project &middot; NTEK Systems Inc. &middot; Group 8, DIT 3-2</p>
+      <div class="tag-row">
+        <span class="tag">Django REST Framework</span>
+        <span class="tag">Django</span>
+        <span class="tag">PostgreSQL</span>
+      </div>
+      <p class="desc">
+        A Human Resource Information System proposed by NTEK to solve problems
+        in its HR processes: manual Daily Time Record processing, disorganized
+        employee documents, manual tracking of leave credits, scattered
+        announcements, variable payroll formulas, and scattered employee data.
+      </p>
+      <p class="desc">
+        <strong>Modules:</strong> General Overview, Announcements, Employee
+        Daily Time Record, Leave Management, Training Management, Employee
+        Turnover, Applicant Tracking System, and Company Performance
+        Evaluations.
+      </p>
+    
+      <a class="project-link" href="https://n-core.site/careers/" target="_blank" rel="noopener">Visit N-CORE &rarr;</a>
+    </div>
+
+  </section>
+
+  <section id="skills">
+    <p class="section-label">Skills</p>
+
+    <div class="skill-block">
+      <h3>Technical</h3>
+      <ul class="skill-items">
+        <li>Manual testing</li>
+        <li>Test case execution</li>
+        <li>Bug reporting</li>
+        <li>HTML/CSS</li>
+        <li>JavaScript</li>
+        <li>Adobe Photoshop</li>
+        <li>Hardware troubleshooting</li>
+      </ul>
+    </div>
+
+    <div class="skill-block">
+      <h3>Soft skills</h3>
+      <ul class="skill-items">
+        <li>Collaboration</li>
+        <li>Creativity</li>
+        <li>Communication</li>
+        <li>Critical thinking</li>
+        <li>Time Management</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="current">
+    <p class="section-label">Current</p>
+    <div class="beyond-grid">
+      <div class="beyond-card">
+        <span class="emoji">🎮</span>
+        <h4>Currently Playing</h4>
+        <p>Mobile Legends</p>
+      </div>
+      <div class="beyond-card">
+        <span class="emoji">🌱</span>
+        <h4>Currently Learning</h4>
+        <p>Web development & QA testing</p>
+      </div>
+      <div class="beyond-card">
+        <span class="emoji">✨</span>
+        <h4>Fun Fact</h4>
+        <p>I can disassemble and reassemble a PC without needing the manual</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <p class="section-label">Let's Connect</p>
+    <p>Whether it's a job opportunity or just a hello — I'd love to hear from you.</p>
+    <div class="contact-row">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=jayarnaldobreyes@gmail.com&su=Portfolio%20Inquiry"
+   class="btn primary"
+   target="_blank"
+   rel="noopener noreferrer">Email Me</a>
+      <a href="https://github.com/Yaji13" target="_blank" rel="noopener" class="btn">GitHub</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Jay Arnaldo B. Reyes</span>
+    <span id="year"></span>
+  </footer>
+
+</div>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const toggle = document.getElementById('themeToggle');
+  const root = document.documentElement;
+
+  function applyTheme(theme) {
+    if (theme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      toggle.textContent = '☀️';
+    } else {
+      root.removeAttribute('data-theme');
+      toggle.textContent = '🌙';
+    }
+  }
+
+  try {
+    const saved = localStorage.getItem('theme');
+    if (saved) applyTheme(saved);
+  } catch (e) {}
+
+  toggle.addEventListener('click', () => {
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    applyTheme(next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  });
+
+  // ===== LOADING SCREEN =====
+  const loader = document.getElementById('loader');
+  const percentEl = document.getElementById('loaderPercent');
+  const fillEl = document.getElementById('loaderFill');
+
+  // Pinakamaikling oras (ms) bago umabot sa 100%. Palitan kung gusto mo (hal. 5000 = 5 secs)
+  const MIN_DURATION = 5000;
+
+  const startTime = performance.now();
+  let progress = 0;
+  let pageLoaded = false;
+
+  function setProgress(value) {
+    progress = Math.min(100, value);
+    percentEl.textContent = Math.round(progress) + '%';
+    fillEl.style.width = progress + '%';
+  }
+
+  // Bilangin ang totoong nilo-load: bawat image + fonts + buong page
+  let tasksDone = 0;
+  const imgs = Array.from(document.images);
+  const totalTasks = imgs.length + 2;
+  const markDone = () => { tasksDone++; };
+
+  imgs.forEach(img => {
+    if (img.complete) markDone();
+    else {
+      img.addEventListener('load', markDone);
+      img.addEventListener('error', markDone);
+    }
+  });
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(markDone);
+  else markDone();
+
+  if (document.readyState === 'complete') { pageLoaded = true; markDone(); }
+  else window.addEventListener('load', () => { pageLoaded = true; markDone(); });
+
+  const timer = setInterval(() => {
+    const elapsed = performance.now() - startTime;
+    const real = (tasksDone / totalTasks) * 100;      // totoong progress
+    const creep = Math.min(90, (elapsed / 10000) * 90); // dahan-dahang akyat para hindi mukhang nakatigil
+
+    let target = pageLoaded && tasksDone >= totalTasks ? 100 : Math.min(90, Math.max(real, creep));
+
+    // Hindi aabot sa 100% hangga't hindi lumilipas ang MIN_DURATION
+    const timeCap = (elapsed / MIN_DURATION) * 100;
+    target = Math.min(target, timeCap);
+
+    if (target > progress) {
+      setProgress(Math.min(target, progress + Math.max(0.3, (target - progress) * 0.1)));
+    }
+
+    if (progress >= 100) {
+      clearInterval(timer);
+      setTimeout(() => loader.classList.add('hidden'), 300);
+    }
+  }, 30);
+</script>
+
+</body>
+</html>
